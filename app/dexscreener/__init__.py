@@ -1,2 +1,2 @@
 from .client import DexscreenerClient
-from .tokens import TokenPair
+from .models import TokenPair

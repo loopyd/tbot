@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import aiohttp
 
 from .retry import retry_on_error, retry_on_error_async
-from .ratelimit import rate_limit, rate_limit_async
+from .ratelimit import RateLimiter, rate_limit, rate_limit_async
 from .easymodel import EasyModel
 
 
@@ -59,7 +59,13 @@ class HttpClient(EasyModel):
     """
     config: HttpClientConfig = Field(
         default_factory=HttpClientConfig, alias="config")
+    rate_limiter: Optional[RateLimiter] = Field(None, alias="rate_limiter")
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.config = HttpClientConfig(**kwargs.get("config", {}))
+        self.rate_limiter = RateLimiter(max_calls=self.config.ratelimit_max_calls, period=self.config.ratelimit_period)
+        
     @computed_field
     @property
     def max_calls(self) -> int:
@@ -79,8 +85,8 @@ class HttpClient(EasyModel):
     def _create_absolute_url(self, relative: str) -> str:
         return f"{self.config.base_url}/{relative}"
 
-    @retry_on_error(Type[requests.HTTPError], Type[requests.ConnectionError], Type[requests.Timeout])
     @rate_limit()
+    @retry_on_error(Type[requests.HTTPError], Type[requests.ConnectionError], Type[requests.Timeout])
     def api_request(self, endpoint: HttpUrl, method: HttpRequestMethod, **kwargs) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
         http_obj = HttpRequest.from_dict(data=kwargs, exclude=["method", "url"])
         http_obj.url = self._create_absolute_url(endpoint)
@@ -89,13 +95,13 @@ class HttpClient(EasyModel):
             raise requests.HTTPError
         return response.json()
 
-    @retry_on_error_async(Type[aiohttp.ClientConnectorError], Type[aiohttp.ClientResponseError], Type[aiohttp.ClientPayloadError])
     @rate_limit_async()
+    @retry_on_error_async(Type[aiohttp.ClientConnectorError], Type[aiohttp.ClientResponseError], Type[aiohttp.ClientPayloadError])
     async def api_request_async(self, endpoint: HttpUrl, method: HttpRequestMethod, **kwargs) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
         http_obj = HttpRequest.from_dict(data=kwargs, exclude=["method", "url"])
         http_obj.url = self._create_absolute_url(endpoint)
         async with aiohttp.ClientSession() as session:
             async with session.request(method.value, http_obj.url, **kwargs) as response:
                 if response.status != 200:
-                    raise aiohttp.ClientResponseError
+                    raise aiohttp.ClientResponseError(request_info=response.request_info, history=response.history, status=response.status, message=response.reason, headers=response.headers)
                 return await response.json()
