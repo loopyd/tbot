@@ -1,7 +1,8 @@
+import http
 from typing import List, Optional
 from pydantic import Field, HttpUrl
 
-from .models import DefiNetwork, PriceResponse
+from .models import DefiNetwork, TokenPrice
 from ..common.easymodel import EasyModel
 from ..common.httpclient import HttpClient, HttpRequestMethod
 
@@ -47,36 +48,42 @@ class BirdeyeClient(EasyModel):
 			return [DefiNetwork(network) for network in response["data"]] if response["data"] is not None and len(response["data"]) > 0 else []
 		return []
 
-	def get_price(self, address: str) -> PriceResponse:
+	def get_price(self, address: str, network: Optional[DefiNetwork] = DefiNetwork.SOLANA, check_liquidity: Optional[int] = None, include_liquidity: Optional[bool] = None) -> TokenPrice:
 		response = self.client.api_request(
-            f"price",
+            "price",
             HttpRequestMethod.GET,
             params={
 				'address': address,
+				**({'check_liquidity': 'true' if check_liquidity else 'false'} if check_liquidity is not None else {}),
+				**({'include_liquidity': include_liquidity} if include_liquidity is not None else {}),
 			},
             headers={
 				'X-API-KEY': self.config.api_key,
+				'X-CHAIN': network.value
 			}
         )
-		return PriceResponse(**response)
+		return TokenPrice(**response.get("data", {}))
 
-	async def get_price_async(self, address: str) -> PriceResponse:
+	async def get_price_async(self, address: str, network: Optional[DefiNetwork] = DefiNetwork.SOLANA, check_liquidity: Optional[int] = None, include_liquidity: Optional[bool] = None) -> TokenPrice:
 		response = await self.client.api_request_async(
-            f"price?address={address}",
+            "price",
             HttpRequestMethod.GET,
             params={
 				'address': address,
+				**({'check_liquidity': 'true' if check_liquidity else 'false'} if check_liquidity is not None else {}),
+				**({'include_liquidity': include_liquidity} if include_liquidity is not None else {}),
 			},
             headers={
 				'X-API-KEY': self.config.api_key,
+				'X-CHAIN': network.value
 			}
         )
-		return PriceResponse(**response)
+		return TokenPrice(**response.get("data", {}))
 
-	def get_multi_price(self, addresses: List[str]) -> PriceResponse:
+	def get_multi_price(self, addresses: List[str]) -> List[TokenPrice]:
 		address_list = ",".join(addresses)
 		response = self.client.api_request(
-            f"multi_price",
+            "multi_price",
             HttpRequestMethod.GET,
             params={
 				'list_address': address_list,
@@ -85,9 +92,9 @@ class BirdeyeClient(EasyModel):
 				'X-API-KEY': self.config.api_key,
 			}
         )
-		return PriceResponse(**response)
+		return [TokenPrice(**token) for token in response.get("data", [])]
 
-	async def get_multi_price_async(self, addresses: List[str]) -> PriceResponse:
+	async def get_multi_price_async(self, addresses: List[str]) -> List[TokenPrice]:
 		response = await self.client.api_request_async(
             f"multi_price",
             HttpRequestMethod.GET,
@@ -98,4 +105,4 @@ class BirdeyeClient(EasyModel):
 				'X-API-KEY': self.config.api_key,
 			}
         )
-		return PriceResponse(**response)
+		return [TokenPrice(**token) for token in response.get("data", [])]

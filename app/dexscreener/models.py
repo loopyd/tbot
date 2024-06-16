@@ -1,7 +1,22 @@
+from enum import Enum
 from pydantic import Field
 from typing import Optional
 import datetime as dt
 from ..common.easymodel import EasyModel
+
+
+class DefiNetwork(Enum):
+    SOLANA = "solana"
+    ETHEREUM = "ethereum"
+    ARBITRUM = "arbitrum"
+    AVALANCHE = "avalanche"
+    BSC = "bsc"
+    OPTIMISM = "optimism"
+    POLYGON = "polygon"
+    BASE = "base"
+    ZKSYNC = "zksync"
+    SUI = "sui"
+
 
 class BaseToken(EasyModel):
     """

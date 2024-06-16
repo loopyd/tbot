@@ -1,15 +1,76 @@
+from functools import wraps
 from httpx import request
 import requests
 import aiohttp
 from pydantic import Field
+
+from ..birdeye.models import DefiNetwork
 from .models import TokenPair
 from ..common.easymodel import EasyModel
 from ..common.httpclient import HttpClient, HttpRequestMethod
-from typing import Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 
 class DexscreenerClientConfig(EasyModel):
     base_url: str = Field(default="https://api.dexscreener.io/latest", alias="base_url")
+
+
+def dexscreener_route():
+    """
+    Dexscreener API route.
+    
+    This decorator is used to wrap methods that make requests to the Dexscreener API.
+    """
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(self, *args, **kwargs) -> Any:
+            key = kwargs.get('address', "")
+            if isinstance(key, list) or isinstance(key, str):
+                if isinstance(key, list) and len(key) > 0:
+                    kwargs['address'] = key
+                elif isinstance(key, str) and len(key) > 0:
+                    kwargs['address'] = key
+                else:
+                    raise ValueError(f"Invalid address provided: {key}")
+            response = func(self, *args, **kwargs)
+            result = [TokenPair(**pair) for pair in response.get("pairs", [])] if response.get("pairs", []) is not None else None
+            if result is not None:
+                if len(result) == 1:
+                    return result[0]
+                return result
+            else:
+                return None
+        return wrapper
+    return decorator
+
+
+def dexscreener_route_async():
+    """
+    Asyncronous Dexscreener API route.
+    
+    This decorator is used to wrap async methods that make requests to the Dexscreener API.
+    """
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        async def wrapper(self, *args, **kwargs) -> Any:
+            key = kwargs.get('address', "")
+            if isinstance(key, list) or isinstance(key, str):
+                if isinstance(key, list) and len(key) > 0:
+                    kwargs['address'] = key
+                elif isinstance(key, str) and len(key) > 0:
+                    kwargs['address'] = key
+                else:
+                    raise ValueError(f"Invalid address provided: {key}")
+            response = await func(self, *args, **kwargs)
+            result = [TokenPair(**pair) for pair in response.get("pairs", [])] if response.get("pairs", []) is not None else None
+            if result is not None:
+                if len(result) == 1:
+                    return result[0]
+                return result
+            else:
+                return None
+        return wrapper
+    return decorator
 
 
 class DexscreenerClient(EasyModel):
@@ -21,45 +82,44 @@ class DexscreenerClient(EasyModel):
         self.client.config.base_url = self.config.base_url
         pass
     
-    def get_token_pair(self, chain: str, address: str) -> Optional[TokenPair]:
+    @dexscreener_route()
+    def get_pairs(self, address: Union[str, List[str]], network: DefiNetwork) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
-        Fetch a pair on the provided Blockchain with the provided Contract Address.
+        Fetch pairs on the provided Blockchain with the provided Contract Address.
         """
-        response = self.client.api_request(HttpRequestMethod.GET, f"dex/pairs/{chain}/{address}")
-        return TokenPair(**response["pair"]) if response["pair"] else None
+        return self.client.api_request(f"dex/pairs/{network.value}/{address}", HttpRequestMethod.GET)
 
-    async def get_token_pair_async(self, chain: str, address: str) -> Optional[TokenPair]:
+    @dexscreener_route_async()
+    async def get_pairs_async(self, address: Union[str, List[str]], network: DefiNetwork) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
-        Async version of `get_token_pair` method - Fetch a pair on the provided Blockchain with the provided Contract Address.
+        Async version of `get_token_pair` method - Fetch pairs on the provided Blockchain with the provided Contract Address.
         """
-        response = await self.client.api_request_async(HttpRequestMethod.GET, f"dex/pairs/{chain}/{address}")
-        return TokenPair(**response["pair"]) if response["pair"] else None
+        return await self.client.api_request_async(f"dex/pairs/{network.value}/{address}", HttpRequestMethod.GET)
 
-    def get_token_pairs(self, address: str) -> list[TokenPair]:
+    @dexscreener_route()
+    def get_tokens(self, address: Union[str, List[str]]) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
         Get pairs matching the provided Contract Address.
         """
-        response = self.client.api_request(HttpRequestMethod.GET,  f"dex/tokens/{address}")
-        return [TokenPair(**pair) for pair in response] if len(response) > 0 else []
-
-    async def get_token_pairs_async(self, address: str) -> list[TokenPair]:
+        return self.client.api_request(f"dex/tokens/{address}", HttpRequestMethod.GET)
+    
+    @dexscreener_route_async()
+    async def get_tokens_async(self, address: str) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
         Async version of `get_token_pairs`.
         """
-        response = await self.client.api_request_async(HttpRequestMethod.GET, f"dex/tokens/{address}")
-        return [TokenPair(**pair) for pair in response] if len(response) > 0 else []
+        return await self.client.api_request_async(f"dex/tokens/{address}", HttpRequestMethod.GET)
 
-    def search_pairs(self, search_query: str) -> list[TokenPair]:
+    @dexscreener_route()
+    def search_pairs(self, search_query: str) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
         Search for pairs matching query
         """
-        response = self.client.api_request("dex/search", HttpRequestMethod.GET, params={"q": search_query})
-        return [TokenPair(**pair) for pair in response.get("pairs", [])] if len(response.get("pairs", [])) > 0 else []
+        return self.client.api_request("dex/search", HttpRequestMethod.GET, params={"q": search_query})
 
-    async def search_pairs_async(self, search_query: str) -> list[TokenPair]:
+    @dexscreener_route_async()
+    async def search_pairs_async(self, search_query: str) -> Union[TokenPair, List[TokenPair], Dict[str, Any], List[Dict[str, Any]], None]:
         """
         Async version of `search_pairs`
         """
-        response = await self.client.api_request_async("dex/search", HttpRequestMethod.GET, params={"q": search_query})
-        return [TokenPair(**pair) for pair in response.get("pairs", [])] if len(response.get("pairs", [])) > 0 else []
-
+        return await self.client.api_request_async("dex/search", HttpRequestMethod.GET, params={"q": search_query})

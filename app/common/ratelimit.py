@@ -3,10 +3,11 @@ ratelimit.py - A rate limiter that can be used as a context manager or decorator
 """
 import asyncio
 import collections
+import threading
 import time
 from typing import Callable, Any, Optional
 from functools import wraps
-from pydantic import Field, computed_field
+from pydantic import Field, SkipValidation
 from .easymodel import EasyModel
 
 
@@ -18,8 +19,8 @@ class RateLimiter(EasyModel):
         default_factory=collections.deque, alias='calls')
     max_calls: int = Field(default_factory=int, alias='max_calls')
     period: float = Field(default_factory=float, alias='period')
-    sync_lock: asyncio.Lock = Field(
-        default_factory=asyncio.Lock, alias='sync_lock')
+    sync_lock: SkipValidation[threading.RLock] = Field(
+        default_factory=SkipValidation[threading.RLock], alias='sync_lock', validate_default=False)
     async_lock: asyncio.Lock = Field(
         default_factory=asyncio.Lock, alias='async_lock')
     min_interval: float = Field(default_factory=float, alias='min_interval')
