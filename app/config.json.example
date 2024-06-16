@@ -1,0 +1,8 @@
+{
+	"birdeye": {
+		"api_key": "YOUR_API_KEY"
+	},
+	"dexscreener": {
+		"api_key": "YOUR_API_KEY"
+	}
+}

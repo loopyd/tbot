@@ -174,7 +174,7 @@ url = "https://public-api.birdeye.so/defi/history_price?address=So11111111111111
 
 headers = {
     "x-chain": "solana",
-    "X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"
+    "X-API-KEY": "your_api_key_here"
 }
 
 response = requests.get(url, headers=headers)
@@ -220,7 +220,7 @@ url = "https://public-api.birdeye.so/defi/txs/token?address=So111111111111111111
 
 headers = {
     "x-chain": "solana",
-    "X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"
+    "X-API-KEY": "your_api_key_here"
 }
 
 response = requests.get(url, headers=headers)
@@ -237,7 +237,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/txs/pair?address=9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT&tx_type=swap&sort_type=desc"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -253,7 +253,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/ohlcv?address=So11111111111111111111111111111111111111112&type=15m"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -268,7 +268,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/ohlcv/pair?address=9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT&type=15m"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -284,7 +284,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/ohlcv/base_quote?base_address=So11111111111111111111111111111111111111112&quote_address=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&type=15m"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -300,7 +300,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/tokenlist?sort_by=v24hUSD&sort_type=desc"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -315,7 +315,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/token_security?address=So11111111111111111111111111111111111111112"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -330,7 +330,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/token_overview?address=So11111111111111111111111111111111111111112"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 
@@ -345,7 +345,7 @@ import requests
 
 url = "https://public-api.birdeye.so/defi/token_creation_info?address=D7rcV8SPxbv94s3kJETkrfMrWqHFs6qrmtbiu6saaany"
 
-headers = {"X-API-KEY": "dc786d8cf5524126941fc415c048b0b9"}
+headers = {"X-API-KEY": "your_api_key_here"}
 
 response = requests.get(url, headers=headers)
 

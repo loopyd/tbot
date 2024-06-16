@@ -1,7 +1,7 @@
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional
 from pydantic import Field, HttpUrl
 
-from .models import DefiNetwork, HistoryResponse, NetworkResponse, PriceResponse, SupportedNetworks
+from .models import DefiNetwork, PriceResponse
 from ..common.easymodel import EasyModel
 from ..common.httpclient import HttpClient, HttpRequestMethod
 
@@ -10,9 +10,9 @@ class BirdeyeClientConfig(EasyModel):
     """
 	Configuration for the BirdeyeClient class.
     """
-    base_url: HttpUrl = Field(default=HttpUrl(
+    base_url: Optional[HttpUrl] = Field(default=HttpUrl(
         "https://public-api.birdeye.so/defi"), alias="base_url")
-    api_key: str = Field(..., alias="api_key")
+    api_key: Optional[str] = Field(None, alias="api_key")
 
 
 class BirdeyeClient(EasyModel):
@@ -26,6 +26,7 @@ class BirdeyeClient(EasyModel):
 	def __init__(self, *args, **kwargs) -> None:
 		super().__init__(*args, **kwargs)
 		self.client.config.base_url = self.config.base_url
+		self.config.api_key = kwargs.get("api_key", None)
 		pass
 
 	def get_supported_networks(self) -> list[DefiNetwork]:
