@@ -1,6 +1,6 @@
 import pytest
-import asyncio
-from src.common.retry import retry_on_error, retry_on_error_async
+from tbot.common.retry import retry_on_error, retry_on_error_async
+
 
 class TestRetry:
     def __init__(self):
@@ -20,11 +20,13 @@ class TestRetry:
             raise ValueError("Error")
         return "Success"
 
+
 def test_retry():
     obj = TestRetry()
     result = obj.test_func()
     assert result == "Success"
     assert obj.attempts == 3
+
 
 @pytest.mark.asyncio
 async def test_retry_async():

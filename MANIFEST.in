@@ -1,2 +1,42 @@
 include README.md
-include LICENSE.md
+include LICENSE
+include requirements.txt
+graft src
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.swp
+global-exclude *.bak
+global-exclude *.tmp
+global-exclude .DS_Store
+# added by check-manifest
+include *.in
+include *.md
+include *.py
+include *.yaml
+include *.yml
+recursive-include docs *.md
+recursive-include scripts *.sh
+recursive-include tests *.md
+recursive-include tests *.py
+
+# added by check-manifest
+include *.in
+include *.md
+include *.py
+include *.yaml
+include *.yml
+recursive-include docs *.md
+recursive-include scripts *.sh
+recursive-include tests *.md
+recursive-include tests *.py
+
+# added by check-manifest
+include *.in
+include *.md
+include *.py
+include *.yaml
+include *.yml
+recursive-include docs *.md
+recursive-include scripts *.sh
+recursive-include tests *.md
+recursive-include tests *.py

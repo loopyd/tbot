@@ -1,10 +1,12 @@
 import requests
 import pytest
-from src.common.httpclient import HttpClient, HttpRequestMethod
+from tbot.common.httpclient import HttpClient, HttpRequestMethod
+
 
 @pytest.fixture
 def http_client():
     return HttpClient()
+
 
 def test_api_request(http_client, mocker):
     mock_response = mocker.patch('requests.request')
@@ -13,6 +15,7 @@ def test_api_request(http_client, mocker):
 
     response = http_client.api_request("test", HttpRequestMethod.GET)
     assert response == {"key": "value"}
+
 
 def test_api_request_error(http_client, mocker):
     mock_response = mocker.patch('requests.request')
