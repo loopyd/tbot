@@ -16,31 +16,26 @@ repos:
       - id: mixed-line-ending
       - id: requirements-txt-fixer
       - id: trailing-whitespace
-
   - repo: https://github.com/PyCQA/isort
     rev: v5.11.3
     hooks:
       - id: isort
         args: ["-a", "from __future__ import annotations"]
-
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.16.0
     hooks:
       - id: pyupgrade
-        args: [--py37-plus]
-
+        args: ["--py37-plus"]
   - repo: https://github.com/hadialqattan/pycln
     rev: v2.4.0
     hooks:
       - id: pycln
-        args: [--config=pyproject.toml]
+        args: ["--config=pyproject.toml"]
         stages: [manual]
-
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:
       - id: codespell
-
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:

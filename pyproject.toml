@@ -3,24 +3,21 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "t-bot"
-version = "0.1.0"
+name = "tbot"
 authors = [
     {name = "Sabertooth Media Group, LLC", email = "support@sabertoothmediagroup.net"},
 ]
 description = "A Python package for interacting with common DeFi APIs."
-readme = "README.md"
-readme-content-type = "text/markdown"
+readme = { file = "README.md", content-type = "text/markdown" }
 classifiers = [
 	"Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
 	"Intended Audience :: Developers",
-	"License :: OSI Approved :: GPL License 3.0",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10"
 dependencies = [
     "aiofiles>=23.2.1",
     "aiohttp>=3.9.5",
@@ -54,21 +51,44 @@ dependencies = [
     "websockets>=11.0.3",
     "yarl>=1.9.4",
 ]
+requires-python = ">=3.10"
+dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["check-manifest"]
-test = ["coverage"]
+spark = [
+    "pyspark>=3.0.0"
+]
+test = [
+    "bandit[toml]>=1.7.5",
+    "black>=23.3.0",
+    "check-manifest>=0.49",
+    "flake8-bugbear>=23.5.9",
+    "flake8-docstrings",
+    "flake8-formatter_junit_xml",
+    "flake8",
+    "flake8-pyproject",
+    "pre-commit>=3.3.1",
+    "pylint>=2.17.4",
+    "pylint_junit",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.1",
+    "pytest-runner",
+    "pytest>=7.3.1",
+    "pytest-github-actions-annotate-failures",
+    "shellcheck-py>=0.9.0.2"
+]
 
 [project.urls]
 Documentation = "https://github.com/loopyd/tbot.git"
 Source = "https://github.com/loopyd/tbot.git"
 Tracker = "https://github.com/loopyd/tbot/issues"
 
-[tool.flit.module]
-name = "app"
+[project.scripts]
+tbot = "tbot.__main__:main"
 
-[tool.flit.scripts]
-app = "app.main:main"
+[tool.flit.module]
+name = "tbot"
 
 [tool.bandit]
 exclude_dirs = ["build", "dist", "tests", "scripts"]
@@ -114,12 +134,12 @@ exclude = [
     "**/node_modules",
     "**/__pycache__",
 ]
-venv = "env37"
+venv = "env311"
 
 reportMissingImports = true
 reportMissingTypeStubs = false
 
-pythonVersion = "3.7"
+pythonVersion = "3.11"
 pythonPlatform = "Linux"
 
 executionEnvironments = [
@@ -158,16 +178,16 @@ commands =
 [testenv:spark]
 extras = spark
 setenv =
-       PYSPARK_DRIVER_PYTHON = {envpython}
-       PYSPARK_PYTHON = {envpython}
+    PYSPARK_DRIVER_PYTHON = {envpython}
+    PYSPARK_PYTHON = {envpython}
 commands =
     pytest -m "spark" {posargs}
 
 [testenv:all]
 extras = all
 setenv =
-       PYSPARK_DRIVER_PYTHON = {envpython}
-       PYSPARK_PYTHON = {envpython}
+    PYSPARK_DRIVER_PYTHON = {envpython}
+    PYSPARK_PYTHON = {envpython}
 commands =
     pytest {posargs}
 """

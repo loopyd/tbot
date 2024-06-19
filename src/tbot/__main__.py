@@ -1,6 +1,6 @@
 import asyncio
 import sys
-from typing import List, Union
+from typing import List, Optional, Union
 from anyio import Path
 
 from .dexscreener.models import TokenPair
@@ -11,7 +11,7 @@ from .birdeye.client import BirdeyeClient
 from .dexscreener.client import DexscreenerClient
 
 
-async def main(args: List[str]) -> None:
+async def main_async(args: Optional[List[str]] = None) -> None:
 	"""
 	Main entry point for the application.
 	"""
@@ -27,5 +27,10 @@ async def main(args: List[str]) -> None:
 	token: Union[TokenPair, List[TokenPair], None] = await dex_client.get_pairs_async(address=SOL_USDC, network=DefiNetwork.SOLANA)
 	print(f"{token.base_token.name} ({token.base_token.symbol}) | Price: {price.value} {token.quote_token.symbol} on {price.updateHumanTime}")
 
+
+def main(args: Optional[List[str]] = None) -> None:
+	asyncio.run(main_async(args))
+ 
+ 
 if __name__ == "__main__":
-    asyncio.run(main(sys.argv[1:]))
+    main(sys.argv[1:])
