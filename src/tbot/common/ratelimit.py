@@ -18,7 +18,7 @@ class RateLimiter(EasyModel):
     """
     A rate limiter that can be used as a context manager or decorator.
     """
-    calls: collections.deque[float] = Field(default=..., alias="calls") # type: ignore
+    calls: collections.deque = Field(default_factory=collections.deque, alias="calls") # type: ignore
     max_calls: int = Field(default_factory=int, alias="max_calls")
     period: float = Field(default_factory=float, alias="period")
     sync_lock: SkipValidation[threading.RLock] = Field(
