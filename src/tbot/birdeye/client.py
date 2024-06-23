@@ -1,3 +1,6 @@
+"""
+Provides a simple rate-limited HTTP client for making requests to the Birdeye API.
+"""
 from typing import Any, List, Optional
 from pydantic import Field, HttpUrl
 

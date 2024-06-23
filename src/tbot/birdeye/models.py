@@ -1,3 +1,6 @@
+"""
+Python module for BirdEye API models.
+"""
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
@@ -9,6 +12,9 @@ from ..common.easymodel import EasyModel
 
 
 class DefiNetwork(Enum):
+    """
+    Enum class for DeFi networks.
+    """
     SOLANA = "solana"
     ETHEREUM = "ethereum"
     ARBITRUM = "arbitrum"
@@ -22,11 +28,17 @@ class DefiNetwork(Enum):
 
 
 class BirdEyeResponse(EasyModel):
+    """
+    Model class for BirdEye API responses
+    """
     data: Union[List[Any], Dict[str, Any]]
     success: bool
 
 
 class SupportedNetworks(EasyModel):
+    """
+    Model class for supported networks by BirdEye API.
+    """
     data: List[DefiNetwork] = Field(default=..., alias="data")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -83,16 +95,22 @@ class SupportedNetworks(EasyModel):
 
 
 class TokenPrice(EasyModel):
-    value: Optional[float] = Field(None, alias="value")
+    """
+    Model class for token price.
+    """
+    value: Optional[float] = Field(default=None, alias="value")
     updateUnixTime: Optional[datetime] = Field(
-        None, alias="updateUnixTime", allow_mutation=True)
+        default=None, alias="updateUnixTime")
     updateHumanTime: Optional[str] = Field(
-        None, alias="updateHumanTime", allow_mutation=True)
-    liquidity: Optional[float] = Field(None, alias="liquidity")
+        default=None, alias="updateHumanTime")
+    liquidity: Optional[float] = Field(default=None, alias="liquidity")
 
     @model_validator(mode="before")
-    def serialize_model(cls, values) -> Any:
-        update_unix_time = values.get("updateUnixTime")
+    def serialize_model(cls, values: Dict[str, Any]) -> Any:
+        """
+        Serialize the model.
+        """
+        update_unix_time: int | None = values.get("updateUnixTime")
         if isinstance(update_unix_time, int):
             time_stamp: datetime = datetime.fromtimestamp(
                 update_unix_time, tz=tzlocal.get_localzone())
