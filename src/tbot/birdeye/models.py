@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import Field, field_validator, model_validator, root_validator, validator
+from pydantic import Field, model_validator
 import tzlocal
 
 from ..common.easymodel import EasyModel
@@ -27,11 +27,11 @@ class BirdEyeResponse(EasyModel):
 
 
 class SupportedNetworks(EasyModel):
-    data: List[DefiNetwork] = Field(..., alias="data")
+    data: List[DefiNetwork] = Field(default=..., alias="data")
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.data = [DefiNetwork(network) for network in self.data]
+        self.data = [DefiNetwork(value=network) for network in self.data]
 
     def __iter__(self):
         return iter(self.data)
@@ -39,13 +39,13 @@ class SupportedNetworks(EasyModel):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         return self.data[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value):
         self.data[index] = value
 
-    def __delitem__(self, index):
+    def __delitem__(self, index: int):
         del self.data[index]
 
     def __contains__(self, item):
@@ -57,19 +57,19 @@ class SupportedNetworks(EasyModel):
     def extend(self, items):
         self.data.extend(items)
 
-    def insert(self, index, item):
+    def insert(self, index: int, item):
         self.data.insert(index, item)
 
     def remove(self, item):
         self.data.remove(item)
 
-    def pop(self, index):
+    def pop(self, index: int):
         return self.data.pop(index)
 
     def clear(self):
         self.data.clear()
 
-    def index(self, item):
+    def index(self, item) -> int:
         return self.data.index(item)
 
     def count(self, item):
@@ -91,10 +91,12 @@ class TokenPrice(EasyModel):
     liquidity: Optional[float] = Field(None, alias="liquidity")
 
     @model_validator(mode="before")
-    def serialize_model(cls, values):
+    def serialize_model(cls, values) -> Any:
         update_unix_time = values.get("updateUnixTime")
         if isinstance(update_unix_time, int):
-            time_stamp = datetime.fromtimestamp(update_unix_time, tz=tzlocal.get_localzone())
-            values["updateHumanTime"] = time_stamp.strftime("%m-%d-%Y @ %H:%M:%S %p (%Z)")
+            time_stamp: datetime = datetime.fromtimestamp(
+                update_unix_time, tz=tzlocal.get_localzone())
+            values["updateHumanTime"] = time_stamp.strftime(
+                "%m-%d-%Y @ %H:%M:%S %p (%Z)")
             values["updateUnixTime"] = update_unix_time
         return values

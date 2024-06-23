@@ -7,21 +7,21 @@ from typing import Any, Callable, List, Optional, Tuple, Type
 from .ratelimit import RateLimiter
 
 
-def retry_on_error(*exceptions, max_retries: Optional[int] = None, delay: Optional[float] = None, backoff: Optional[float] = None) -> Callable[..., Any]:
+def retry_on_error(*exceptions: Type[Exception], max_retries: Optional[int] = None, delay: Optional[float] = None, backoff: Optional[float] = None) -> Callable[..., Any]:
 	"""
 	A decorator that retries a function call if the registered exceptions are raised.
 	"""
 	def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
 		@wraps(func)
-		def wrapper(self, *args, **kwargs):
+		def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
 			b_current_retries = 0
-			b_max_retries = max_retries if max_retries is not None else getattr(
+			b_max_retries: int | Any = max_retries if max_retries is not None else getattr(
 				self, 'max_retries', 3)
-			b_delay = delay if delay is not None else getattr(
+			b_delay: float | Any = delay if delay is not None else getattr(
 				self, 'delay', 1.0)
-			b_backoff = backoff if backoff is not None else getattr(
+			b_backoff: float | Any = backoff if backoff is not None else getattr(
 				self, 'backoff', 2.0)
-			b_exceptions = exceptions if exceptions else (NotImplementedError,)
+			b_exceptions: Any = exceptions if exceptions else (NotImplementedError,)
 
 			while b_current_retries < b_max_retries:
 				try:
@@ -36,18 +36,18 @@ def retry_on_error(*exceptions, max_retries: Optional[int] = None, delay: Option
 		return wrapper
 	return decorator
 
-def retry_on_error_async(*exceptions, max_retries: Optional[int] = None, delay: Optional[float] = None, backoff: Optional[float] = None) -> Callable[..., Any]:
+def retry_on_error_async(*exceptions: Type[Exception], max_retries: Optional[int] = None, delay: Optional[float] = None, backoff: Optional[float] = None) -> Callable[..., Any]:
 	"""
 	A decorator that retries a function call if the registered exceptions are raised.
 	"""
 	def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-		@wraps(func)
-		async def wrapper(self, *args, **kwargs):
+		@wraps(wrapped=func)
+		async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
 			b_current_retries = 0
-			b_max_retries = max_retries if max_retries is not None else getattr(self, 'max_retries', 3)
-			b_delay = delay if delay is not None else getattr(self, 'delay', 1.0)
-			b_backoff = backoff if backoff is not None else getattr(self, 'backoff', 2.0)
-			b_exceptions = exceptions if exceptions else (NotImplementedError,)
+			b_max_retries: int | Any = max_retries if max_retries is not None else getattr(self, 'max_retries', 3)
+			b_delay: float | Any = delay if delay is not None else getattr(self, 'delay', 1.0)
+			b_backoff: float | Any = backoff if backoff is not None else getattr(self, 'backoff', 2.0)
+			b_exceptions: Any = exceptions if exceptions else (NotImplementedError,)
 
 			while b_current_retries < b_max_retries:
 				try:
@@ -58,6 +58,6 @@ def retry_on_error_async(*exceptions, max_retries: Optional[int] = None, delay: 
 					b_current_retries += 1
 					if b_current_retries >= b_max_retries:
 						raise e
-					await asyncio.sleep(b_delay * (b_backoff ** (b_current_retries - 1)))
+					await asyncio.sleep(delay=b_delay * (b_backoff ** (b_current_retries - 1)))
 		return wrapper
 	return decorator
