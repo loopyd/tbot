@@ -1,5 +1,5 @@
 """
-ratelimit.py - A rate limiter that can be used as a context manager or decorator.
+A rate limiter that can be used as a context manager or decorator.
 """
 
 import asyncio

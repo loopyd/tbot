@@ -1,6 +1,7 @@
 """
 Main entry point for the application.
 """
+
 import asyncio
 import sys
 from typing import List, Optional, Union
@@ -30,8 +31,12 @@ async def main_async(args: Optional[List[str]] = None) -> None:
     SOL_BASE = "So11111111111111111111111111111111111111112"
     SOL_USDC = "FpCMFDFGYotvufJ7HrFHsWEiiQCGbkLCtwHiDnh7o28Q"
     price: TokenPrice = await birdeye_client.get_price_async(address=SOL_BASE, network=DefiNetwork.SOLANA)
-    token: Union[TokenPair, List[TokenPair], None] = await dex_client.get_pairs_async(address=SOL_USDC, network=DefiNetwork.SOLANA)
-    print(f"{token.base_token.name} ({token.base_token.symbol}) | Price: {price.value} {token.quote_token.symbol} on {price.updateHumanTime}")
+    token: Union[TokenPair, List[TokenPair], None] = await dex_client.get_pairs_async(
+        address=SOL_USDC, network=DefiNetwork.SOLANA
+    )
+    print(
+        f"{token.base_token.name} ({token.base_token.symbol}) | Price: {price.value} {token.quote_token.symbol} on {price.updateHumanTime}"
+    )
 
 
 def main(args: Optional[List[str]] = None) -> None:
